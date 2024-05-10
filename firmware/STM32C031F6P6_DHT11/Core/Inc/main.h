@@ -53,13 +53,16 @@ extern "C" {
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
-
+void microsecond_delay(uint16_t duration);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define DHT11_Data_Pin GPIO_PIN_1
+#define DHT11_Data_GPIO_Port GPIOA
 
 /* USER CODE BEGIN Private defines */
-
+#define TIM1_PRESCALER 12
+#define TIM1_ARR 65535
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus
