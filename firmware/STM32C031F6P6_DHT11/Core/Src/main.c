@@ -31,7 +31,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define I2C_SLAVE_ADDRESS 50
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -48,6 +48,7 @@ TIM_HandleTypeDef htim1;
 /* USER CODE BEGIN PV */
 DHT11_data data;
 uint32_t counter_glob = 0;
+uint8_t I2c_slave_address = 25;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -56,7 +57,7 @@ static void MX_GPIO_Init(void);
 static void MX_TIM1_Init(void);
 static void MX_I2C1_Init(void);
 /* USER CODE BEGIN PFP */
-
+static void real_I2C1_Init(void);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -96,6 +97,9 @@ int main(void)
   MX_TIM1_Init();
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
+
+  I2c_slave_address = 12;
+  real_I2C1_Init();
 
   if (HAL_TIM_Base_Start(&htim1) != HAL_OK)      Error_Handler();
   if (HAL_I2C_EnableListen_IT(&hi2c1) != HAL_OK) Error_Handler();
@@ -166,7 +170,7 @@ static void MX_I2C1_Init(void)
   /* USER CODE END I2C1_Init 0 */
 
   /* USER CODE BEGIN I2C1_Init 1 */
-
+  #ifdef USE_CUBEMX_SHITTY_CODE// Prevent CubeMX shitty code
   /* USER CODE END I2C1_Init 1 */
   hi2c1.Instance = I2C1;
   hi2c1.Init.Timing = 0x40000A0B;
@@ -196,7 +200,7 @@ static void MX_I2C1_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN I2C1_Init 2 */
-
+  #endif
   /* USER CODE END I2C1_Init 2 */
 
 }
@@ -285,6 +289,41 @@ void microsecond_delay(uint16_t duration)
 	__HAL_TIM_SET_COUNTER(&htim1, 0);                 // set the counter value a 0
 	while (__HAL_TIM_GET_COUNTER(&htim1) < duration); // wait for the counter to reach the us input in the parameter
 }
+
+
+static void real_I2C1_Init(void)
+{
+	hi2c1.Instance = I2C1;
+	hi2c1.Init.Timing = 0x40000A0B;
+	hi2c1.Init.OwnAddress1 = (I2c_slave_address << 1);
+	hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
+	hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+	hi2c1.Init.OwnAddress2 = 0;
+	hi2c1.Init.OwnAddress2Masks = I2C_OA2_NOMASK;
+	hi2c1.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
+	hi2c1.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
+
+	if (HAL_I2C_Init(&hi2c1) != HAL_OK)
+	{
+	Error_Handler();
+	}
+
+	/** Configure Analogue filter
+	*/
+	if (HAL_I2CEx_ConfigAnalogFilter(&hi2c1, I2C_ANALOGFILTER_ENABLE) != HAL_OK)
+	{
+	Error_Handler();
+	}
+
+	/** Configure Digital filter
+	*/
+	if (HAL_I2CEx_ConfigDigitalFilter(&hi2c1, 0) != HAL_OK)
+	{
+	Error_Handler();
+	}
+}
+
+
 /* USER CODE END 4 */
 
 /**
