@@ -76,6 +76,7 @@ void DHT_GetData(DHT11_data *data)
 {
     DHT11_Start (data);
     uint8_t presence = DHT11_Check_Response (data);
+    (void) presence;
 
 	data->int_humidity = DHT11_Read (data);
 	data->dec_humidity = DHT11_Read (data);
