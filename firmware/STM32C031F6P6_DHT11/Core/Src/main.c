@@ -22,6 +22,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "DHT11.h"
+#include "module_register.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -49,6 +50,9 @@ TIM_HandleTypeDef htim1;
 DHT11_data data;
 uint32_t counter_glob = 0;
 uint8_t I2c_slave_address = 25;
+
+volatile float real_value = 0;
+volatile float read_value = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -112,6 +116,16 @@ int main(void)
   {
 	counter_glob++;
 	DHT_GetData(&data);
+
+	set_sensor_value_1(data.humidity);
+	set_sensor_value_2(data.humidity);
+	real_value = data.humidity;
+	read_value = get_sensor_value_1();
+
+	volatile int toto = sizeof(float);
+
+
+
 	HAL_Delay(1000);
 
     /* USER CODE END WHILE */

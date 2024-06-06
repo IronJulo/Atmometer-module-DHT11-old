@@ -1,1 +1,4 @@
-STM32C031F6P6/Debug/*
+firmware/STM32C031F6P6_DHT11/Debug/*
+firmware/STM32C031F6P6_DHT11/S.launch
+
+*.launch

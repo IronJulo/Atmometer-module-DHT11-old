@@ -9,15 +9,10 @@
 #include "stm32c0xx_hal.h"
 #include "main.h"
 #include "i2c_slave.h"
+#include "module_register.h"
 
-#define RxSIZE 2
 uint8_t RxData[RxSIZE];
 uint8_t RxCounter = 0;
-
-#define TRANSMISSION_WRITE_SIZE 2
-
-uint8_t registers[32] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-
 uint32_t error_counter = 0;
 
 /**
@@ -26,18 +21,6 @@ uint32_t error_counter = 0;
 void HAL_I2C_ListenCpltCallback(I2C_HandleTypeDef *hi2c)
 {
 	HAL_I2C_EnableListen_IT(hi2c);
-}
-
-void set_register(uint8_t reg_addr, uint8_t reg_value) {
-	if (reg_addr > 32) return;
-
-	registers[reg_addr] = reg_value;
-}
-
-uint8_t get_register(uint8_t reg_addr) {
-	if (reg_addr > 32) return 0;
-
-	return registers[reg_addr];
 }
 
 /**
@@ -54,13 +37,17 @@ void HAL_I2C_AddrCallback(I2C_HandleTypeDef *hi2c, uint8_t TransferDirection, ui
 	}
 	else
 	{
-		uint8_t reg_value = get_register(RxData[0]);
+		uint8_t reg_value = 0;
+		uint8_t errors = read_register(RxData[0], &reg_value);
+		(void) errors;
 		HAL_I2C_Slave_Seq_Transmit_IT(hi2c, &reg_value, 1, I2C_FIRST_AND_LAST_FRAME);
 	}
 }
 
 void process_data(I2C_HandleTypeDef *hi2c) {
-	set_register(RxData[0], RxData[1]);
+	//set_register(RxData[0], RxData[1]);
+	uint8_t errors = write_register(RxData[0], RxData[1]);
+	(void) errors;
 	//HAL_I2C_EnableListen_IT(hi2c);
 }
 

@@ -45,25 +45,40 @@
                                                                         // float* real_value = (float*) &value;
 */
 
+#define REGISTER_ERROR_OK           0
+#define REGISTER_ERROR_OUT_OF_BOUND 1
+#define REGISTER_ERROR_READ_ONLY    2
+
+
 enum Register
 {
+	// Read Only
 	SENSOR_TYPE_MSB,
 	SENSOR_TYPE_LSB,
 	SENSOR_ID_MSB1,
 	SENSOR_ID_MSB2,
 	SENSOR_ID_LSB1,
 	SENSOR_ID_LSB2,
-	SENSOR_CONFIG,
-	SENSOR_UPDATE_PERIOD,
+	SENSOR_VALUE_1_MSB1,
+	SENSOR_VALUE_1_MSB2,
+	SENSOR_VALUE_1_LSB1,
+	SENSOR_VALUE_1_LSB2,
+	SENSOR_VALUE_2_MSB1,
+	SENSOR_VALUE_2_MSB2,
+	SENSOR_VALUE_2_LSB1,
+	SENSOR_VALUE_2_LSB2,
 	SENSOR_ERROR_MSB,
 	SENSOR_ERROR_LSB,
-	SENSOR_VALUE_MSB1,
-	SENSOR_VALUE_MSB2,
-	SENSOR_VALUE_LSB1,
-	SENSOR_VALUE_LSB2,
 
-	REGISTER_MAX_VALUE,
+    // Read/Write
+	SENSOR_CONFIG,
+	SENSOR_UPDATE_PERIOD,
+
+	REGISTER_ENUM_END,
 };
+
+#define REGISTER_READ_WRITE_BEGIN SENSOR_CONFIG
+#define REGISTER_MAX_VALUE REGISTER_ENUM_END
 
 enum ConfigBitField
 {
@@ -81,7 +96,8 @@ void set_sensor_config_readInProgress(bool value);
 void set_sensor_config_idle(bool value);
 void set_sensor_updatePeriod(uint8_t value);
 void set_sensor_error(uint16_t value);
-void set_sensor_value(float value);
+void set_sensor_value_1(float value);
+void set_sensor_value_2(float value);
 
 uint16_t get_sensor_type();
 uint64_t get_sensor_id();
@@ -89,7 +105,8 @@ bool get_sensor_config_ReadInProgress();
 bool get_sensor_config_Idle();
 uint8_t get_sensor_updatePeriod();
 uint16_t get_sensor_error();
-float get_sensor_value();
+float get_sensor_value_1();
+float get_sensor_value_2();
 
 
 
