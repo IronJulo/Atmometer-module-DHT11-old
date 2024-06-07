@@ -38,14 +38,14 @@ void HAL_I2C_AddrCallback(I2C_HandleTypeDef *hi2c, uint8_t TransferDirection, ui
 	else
 	{
 		uint8_t reg_value = 0;
-		uint8_t errors = read_register(RxData[0], &reg_value);
-		(void) errors;
+		//uint8_t errors = read_register(RxData[0], &reg_value);
+		uint8_t errors = read_selected_register(&reg_value);
+		(void) errors; // TODO
 		HAL_I2C_Slave_Seq_Transmit_IT(hi2c, &reg_value, 1, I2C_FIRST_AND_LAST_FRAME);
 	}
 }
 
 void process_data(I2C_HandleTypeDef *hi2c) {
-	//set_register(RxData[0], RxData[1]);
 	uint8_t errors = write_register(RxData[0], RxData[1]);
 	(void) errors;
 	//HAL_I2C_EnableListen_IT(hi2c);

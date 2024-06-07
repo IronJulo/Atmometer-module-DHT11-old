@@ -124,8 +124,7 @@ int main(void)
 
 	volatile int toto = sizeof(float);
 
-
-
+	(void) toto;
 	HAL_Delay(1000);
 
     /* USER CODE END WHILE */

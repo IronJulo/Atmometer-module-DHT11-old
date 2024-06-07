@@ -15,7 +15,7 @@
 
 0x00:0x01 [sensorTypeMSB][sensorTypeLSB]
 0x02:0x05 [sensorIDMSB1][sensorIDMSB2][sensorIDLSB1][sensorIDLSB1]
-0x06:0x06 [sensorConf] ---> [readInProgress][idle][][][][][][]                  // bit field used to manage sensor
+0x06:0x06 [sensorConf] ---> [readInProgress][idle][autoIncrement]...    // bit field used to manage sensor
                                                                         // readInProgress:
                                                                         // set this value before reading data from sensor to prevent byte mangling
                                                                         //      0: sensor can update value
@@ -73,6 +73,7 @@ enum Register
     // Read/Write
 	SENSOR_CONFIG,
 	SENSOR_UPDATE_PERIOD,
+	SENSOR_READ_ADDRESS,
 
 	REGISTER_ENUM_END,
 };
@@ -84,11 +85,13 @@ enum ConfigBitField
 {
 	CBF_READ_IN_PROGRESS,
 	CBF_IDLE,
+	CBF_SEQUENTIAL_READ,
 };
 
 
 uint8_t write_register(uint8_t address, uint8_t value);
 uint8_t read_register(uint8_t address, uint8_t *value);
+uint8_t read_selected_register(uint8_t *value);
 
 void set_sensor_type(uint16_t value);
 void set_sensor_id(uint64_t value);
@@ -98,15 +101,18 @@ void set_sensor_updatePeriod(uint8_t value);
 void set_sensor_error(uint16_t value);
 void set_sensor_value_1(float value);
 void set_sensor_value_2(float value);
+void set_sensor_read_address(uint8_t value);
 
 uint16_t get_sensor_type();
 uint64_t get_sensor_id();
 bool get_sensor_config_ReadInProgress();
 bool get_sensor_config_Idle();
+bool get_sensor_config_SequentialRead();
 uint8_t get_sensor_updatePeriod();
 uint16_t get_sensor_error();
 float get_sensor_value_1();
 float get_sensor_value_2();
+uint8_t get_sensor_read_address();
 
 
 

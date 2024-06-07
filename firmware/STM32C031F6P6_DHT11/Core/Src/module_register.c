@@ -16,7 +16,7 @@ uint8_t write_register(uint8_t address, uint8_t value)
 {
 	if (address >= REGISTER_MAX_VALUE)
 		return REGISTER_ERROR_OUT_OF_BOUND;
-	if (address >= REGISTER_READ_WRITE_BEGIN)
+	if (address < REGISTER_READ_WRITE_BEGIN)
 		return REGISTER_ERROR_READ_ONLY;
 
 	module_registers[address] = value;
@@ -29,6 +29,18 @@ uint8_t read_register(uint8_t address, uint8_t *value)
 		return REGISTER_ERROR_OUT_OF_BOUND;
 
 	*value = module_registers[address];
+	return REGISTER_ERROR_OK;
+}
+
+uint8_t read_selected_register(uint8_t *value)
+{
+	uint8_t address = get_sensor_read_address();
+	uint8_t error = read_register(address, value);
+
+	if(error != REGISTER_ERROR_OK)
+		return error;
+	if (get_sensor_config_SequentialRead())
+		module_registers[SENSOR_READ_ADDRESS]++;
 	return REGISTER_ERROR_OK;
 }
 
@@ -66,6 +78,20 @@ void set_sensor_config_idle(bool value)
 
 	module_registers[SENSOR_CONFIG] = reg_value;
 }
+
+void set_sensor_config_sequentialRead(bool value)
+{
+	uint8_t reg_value = module_registers[SENSOR_CONFIG];
+
+	if (value)
+		reg_value |= (1 << CBF_SEQUENTIAL_READ);
+	else
+		reg_value &= ~(1 << CBF_SEQUENTIAL_READ);
+
+	module_registers[SENSOR_CONFIG] = reg_value;
+}
+
+
 void set_sensor_updatePeriod(uint8_t value)
 {
 	module_registers[SENSOR_UPDATE_PERIOD] = value;
@@ -96,6 +122,11 @@ void set_sensor_value_2(float value)
 	module_registers[SENSOR_VALUE_2_LSB2] = ((*r_value & 0x000000ff) >>  0);
 }
 
+void set_sensor_read_address(uint8_t value)
+{
+	module_registers[SENSOR_READ_ADDRESS] = value;
+}
+
 uint16_t get_sensor_type()
 {
 	uint16_t result = 0;
@@ -123,6 +154,10 @@ bool get_sensor_config_ReadInProgress()
 bool get_sensor_config_Idle()
 {
 	return((module_registers[SENSOR_CONFIG] >> CBF_IDLE) & 0x01);
+}
+bool get_sensor_config_SequentialRead()
+{
+	return((module_registers[SENSOR_CONFIG] >> CBF_SEQUENTIAL_READ) & 0x01);
 }
 uint8_t get_sensor_updatePeriod()
 {
@@ -171,6 +206,11 @@ float get_sensor_value_2()
 	r_result = (float *) &result;
 
 	return *r_result;
+}
+
+uint8_t get_sensor_read_address()
+{
+	return module_registers[SENSOR_READ_ADDRESS];
 }
 
 #endif /* SRC_MODULE_REGISTER_C_ */
