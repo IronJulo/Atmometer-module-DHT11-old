@@ -116,7 +116,7 @@ int main(void)
   while (1)
   {
 	counter_glob++;
-	//DHT_GetData(&data);
+	DHT_GetData(&data);
 
 	set_sensor_value_1(data.humidity);
 	set_sensor_value_2(data.temperature);
