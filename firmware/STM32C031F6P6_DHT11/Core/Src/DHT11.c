@@ -7,6 +7,8 @@
 
 #include "DHT11.h"
 
+#define PIN_WAIT_TIMEOUT 100
+
 void Set_Pin_Output(GPIO_TypeDef *GPIO_Port, uint16_t GPIO_Pin)
 {
 	GPIO_InitTypeDef GPIO_InitStruct = {0};
@@ -50,7 +52,8 @@ uint8_t DHT11_Check_Response(DHT11_data *data)
 		if ((HAL_GPIO_ReadPin (data->GPIO_Port, data->GPIO_Pin))) Response = 1;
 		else Response = -1;
 	}
-	while ((HAL_GPIO_ReadPin (data->GPIO_Port, data->GPIO_Pin)));   // wait for the pin to go low
+	uint8_t counter = 0;
+	while ((HAL_GPIO_ReadPin (data->GPIO_Port, data->GPIO_Pin)) && counter < PIN_WAIT_TIMEOUT);   // wait for the pin to go low
 
 	return Response;
 }
@@ -60,14 +63,21 @@ uint8_t DHT11_Read(DHT11_data *data)
 	uint8_t i,j;
 	for (j=0;j<8;j++)
 	{
-		while (!(HAL_GPIO_ReadPin (data->GPIO_Port, data->GPIO_Pin)));   // wait for the pin to go high
+		uint8_t counter = 0;
+		while (!(HAL_GPIO_ReadPin (data->GPIO_Port, data->GPIO_Pin)) && counter < PIN_WAIT_TIMEOUT) // wait for the pin to go high
+			counter++;
 		microsecond_delay(40);   // wait for 40 us
 		if (!(HAL_GPIO_ReadPin (data->GPIO_Port, data->GPIO_Pin)))   // if the pin is low
 		{
 			i&= ~(1<<(7-j));   // write 0
 		}
-		else i|= (1<<(7-j));  // if the pin is high, write 1
-		while ((HAL_GPIO_ReadPin (data->GPIO_Port, data->GPIO_Pin)));  // wait for the pin to go low
+		else // if the pin is high
+		{
+			i|= (1<<(7-j));  // write 1
+		}
+		counter = 0;
+		while ((HAL_GPIO_ReadPin (data->GPIO_Port, data->GPIO_Pin)) && counter < PIN_WAIT_TIMEOUT) // wait for the pin to go low
+			counter++;
 	}
 	return i;
 }
@@ -88,7 +98,9 @@ void DHT_GetData(DHT11_data *data)
 	if (checksum == (data->int_humidity + data->dec_humidity + data->int_temperature + data->dec_temperature))
 	{
 		data->temperature = data->int_temperature;
+		data->temperature += (float)data->dec_temperature/10;
 		data->humidity = data->int_humidity;
+		data->humidity += (float)data->dec_humidity/10;
 	}
 }
 

@@ -53,6 +53,7 @@ uint8_t I2c_slave_address = 25;
 
 volatile float real_value = 0;
 volatile float read_value = 0;
+volatile uint64_t stored_value = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -115,16 +116,13 @@ int main(void)
   while (1)
   {
 	counter_glob++;
-	DHT_GetData(&data);
+	//DHT_GetData(&data);
 
 	set_sensor_value_1(data.humidity);
-	set_sensor_value_2(data.humidity);
+	set_sensor_value_2(data.temperature);
 	real_value = data.humidity;
 	read_value = get_sensor_value_1();
 
-	volatile int toto = sizeof(float);
-
-	(void) toto;
 	HAL_Delay(1000);
 
     /* USER CODE END WHILE */

@@ -104,22 +104,22 @@ void set_sensor_error(uint16_t value)
 
 void set_sensor_value_1(float value)
 {
-	uint64_t *r_value = (uint64_t *) &value;
+	uint64_t r_value = value * 1000;
 
-	module_registers[SENSOR_VALUE_1_MSB1] = ((*r_value & 0xff000000) >> 24);
-	module_registers[SENSOR_VALUE_1_MSB2] = ((*r_value & 0x00ff0000) >> 16);
-	module_registers[SENSOR_VALUE_1_LSB1] = ((*r_value & 0x0000ff00) >>  8);
-	module_registers[SENSOR_VALUE_1_LSB2] = ((*r_value & 0x000000ff) >>  0);
+	module_registers[SENSOR_VALUE_1_MSB1] = ((r_value & 0xff000000) >> 24);
+	module_registers[SENSOR_VALUE_1_MSB2] = ((r_value & 0x00ff0000) >> 16);
+	module_registers[SENSOR_VALUE_1_LSB1] = ((r_value & 0x0000ff00) >>  8);
+	module_registers[SENSOR_VALUE_1_LSB2] = ((r_value & 0x000000ff) >>  0);
 }
 
 void set_sensor_value_2(float value)
 {
-	uint64_t *r_value = (uint64_t *) &value;
+	uint64_t r_value = value * 1000;
 
-	module_registers[SENSOR_VALUE_2_MSB1] = ((*r_value & 0xff000000) >> 24);
-	module_registers[SENSOR_VALUE_2_MSB2] = ((*r_value & 0x00ff0000) >> 16);
-	module_registers[SENSOR_VALUE_2_LSB1] = ((*r_value & 0x0000ff00) >>  8);
-	module_registers[SENSOR_VALUE_2_LSB2] = ((*r_value & 0x000000ff) >>  0);
+	module_registers[SENSOR_VALUE_2_MSB1] = ((r_value & 0xff000000) >> 24);
+	module_registers[SENSOR_VALUE_2_MSB2] = ((r_value & 0x00ff0000) >> 16);
+	module_registers[SENSOR_VALUE_2_LSB1] = ((r_value & 0x0000ff00) >>  8);
+	module_registers[SENSOR_VALUE_2_LSB2] = ((r_value & 0x000000ff) >>  0);
 }
 
 void set_sensor_read_address(uint8_t value)
@@ -184,10 +184,9 @@ float get_sensor_value_1()
 	result <<= 8;
 	result |= module_registers[SENSOR_VALUE_1_LSB2];
 
-	float *r_result = 0;
-	r_result = (float *) &result;
+	float r_result = (float)result / 1000;
 
-	return *r_result;
+	return r_result;
 }
 
 float get_sensor_value_2()
@@ -202,10 +201,9 @@ float get_sensor_value_2()
 	result <<= 8;
 	result |= module_registers[SENSOR_VALUE_2_LSB2];
 
-	float *r_result = 0;
-	r_result = (float *) &result;
+	float r_result = (float)result / 1000;
 
-	return *r_result;
+	return r_result;
 }
 
 uint8_t get_sensor_read_address()
